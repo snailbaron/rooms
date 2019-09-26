@@ -87,6 +87,16 @@ TraceResult Level::trace(
     for (;;) {
         if (nextXDistance < nextYDistance) {
             cellX += stepX;
+        } else {
+            cellY += stepY;
+        }
+
+        if (cellX < 0 || cellX >= _cells.width() ||
+                cellY < 0 || cellY >= _cells.width()) {
+            return {std::numeric_limits<float>::infinity(), false};
+        }
+
+        if (nextXDistance < nextYDistance) {
             if (_cells.at(cellX, cellY) == Cell::Full) {
                 return {
                     nextXDistance * dot(lookDirection, rayDirection),
@@ -95,7 +105,6 @@ TraceResult Level::trace(
             }
             nextXDistance += dx;
         } else {
-            cellY += stepY;
             if (_cells.at(cellX, cellY) == Cell::Full) {
                 return {
                     nextYDistance * dot(lookDirection, rayDirection),
@@ -103,11 +112,6 @@ TraceResult Level::trace(
                 };
             }
             nextYDistance += dy;
-        }
-
-        if (cellX < 0 || cellX >= _cells.width() ||
-                cellY < 0 || cellY >= _cells.height()) {
-            return {std::numeric_limits<float>::infinity(), false};
         }
     }
 }

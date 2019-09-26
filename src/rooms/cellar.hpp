@@ -1,5 +1,6 @@
 #pragma once
 
+#include <algorithm>
 #include <vector>
 
 /**
@@ -28,18 +29,13 @@ public:
 
     T& operator()(size_t x, size_t y)
     {
-        if (x >= _width) {
-            _width = x + 1;
-        }
-        if (y >= _height) {
-            _height = y + 1;
+        auto w = std::max(x, y) + 1;
+        if (w * w >= _data.size()) {
+            _width = w;
+            _data.resize(w * w);
         }
 
-        auto i = index(x, y);
-        if (_data.size() <= i) {
-            _data.resize(i + 1);
-        }
-        return _data[i];
+        return _data[index(x, y)];
     }
 
     size_t width() const
@@ -47,15 +43,10 @@ public:
         return _width;
     }
 
-    size_t height() const
-    {
-        return _height;
-    }
-
     void inverseByX()
     {
         for (size_t i = 0; i < _width / 2; i++) {
-            for (size_t j = 0; j < _height; j++) {
+            for (size_t j = 0; j < _width; j++) {
                 std::swap((*this)(i, j), (*this)(_width - 1 - i, j));
             }
         }
@@ -64,8 +55,8 @@ public:
     void inverseByY()
     {
         for (size_t i = 0; i < _width; i++) {
-            for (size_t j = 0; j < _height / 2; j++) {
-                std::swap((*this)(i, j), (*this)(i, _height - 1 - j));
+            for (size_t j = 0; j < _width / 2; j++) {
+                std::swap((*this)(i, j), (*this)(i, _width - 1 - j));
             }
         }
     }
@@ -82,5 +73,4 @@ private:
 
     std::vector<T> _data;
     size_t _width = 0;
-    size_t _height = 0;
 };

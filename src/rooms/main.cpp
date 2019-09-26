@@ -12,10 +12,10 @@ constexpr char testLevel[] =
     "#..###.#.#\n"
     "#.##...#.#\n"
     "#..###.#.#\n"
-    "#....#...#\n"
+    "#....#....\n"
     "#..###...#\n"
-    "#........#\n"
-    "##########\n"
+    "#.........\n"
+    "#####...##\n"
 ;
 
 int main()
@@ -29,6 +29,9 @@ int main()
 
     auto view = View{field};
 
+    auto s = std::sin(0.02f);
+    auto c = std::cos(0.02f);
+
     auto frameTimer = FrameTimer{config().gameFps};
     bool done = false;
     while (!done) {
@@ -40,6 +43,13 @@ int main()
         }
 
         auto framesPassed = frameTimer();
+
+        for (auto i = framesPassed; i > 0; i--) {
+            Vector<float> d;
+            d.x = c * field.heroDirection.x - s * field.heroDirection.y;
+            d.y = s * field.heroDirection.x + c * field.heroDirection.y;
+            field.heroDirection = d;
+        }
 
         if (framesPassed > 0) {
             view.draw();

@@ -19,5 +19,5 @@ private:
     Point<int> _position = {10, 10};
     Vector<int> _size = {800, 600};
 
-    Vector<int> _resolution = {300, 100};
+    Vector<int> _resolution = {800, 600};
 };
