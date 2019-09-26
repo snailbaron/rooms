@@ -7,11 +7,32 @@ View::View(const Field& field)
 {
     _window.reset(SDL_CreateWindow(
         config().windowTitle.c_str(),
-        SDL_WINDOWPOS_UNDEFINED,
-        SDL_WINDOWPOS_UNDEFINED,
+        SDL_WINDOWPOS_CENTERED,
+        SDL_WINDOWPOS_CENTERED,
         config().windowWidth,
         config().windowHeight,
-        0));
+        0
+    ));
+}
+
+bool View::isAlive() const
+{
+    return _isAlive;
+}
+
+void View::processInput()
+{
+    if (!_isAlive) {
+        return;
+    }
+
+    SDL_Event event;
+    while (SDL_PollEvent(&event)) {
+        if (event.type == SDL_QUIT) {
+            _isAlive = false;
+            return;
+        }
+    }
 }
 
 void View::draw()

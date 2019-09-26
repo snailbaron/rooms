@@ -1,5 +1,7 @@
 #pragma once
 
+#include "util.hpp"
+
 #include <cmath>
 #include <ostream>
 #include <type_traits>
@@ -67,7 +69,7 @@ auto operator-(const Vector<U>& lhs, const Vector<V>& rhs)
     return Vector<std::common_type_t<U, V>>{lhs.x - rhs.x, lhs.y - rhs.y};
 }
 
-template <class T, class S>
+template <class T, class S, class = std::enable_if_t<have_common_type_v<T, S>>>
 auto operator*(const Vector<T>& vector, const S& scalar)
 {
     Vector<std::common_type_t<T, S>> result = vector;
@@ -75,7 +77,7 @@ auto operator*(const Vector<T>& vector, const S& scalar)
     return result;
 }
 
-template <class T, class S>
+template <class T, class S, class = std::enable_if_t<have_common_type_v<T, S>>>
 auto operator*(const S& scalar, const Vector<T>& vector)
 {
     return operator*(vector, scalar);
@@ -100,6 +102,14 @@ Vector<T> ort(const Vector<T>& vector)
     return {vector.y, -vector.x};
 }
 
+template <class T>
+Vector<T> normalized(const Vector<T>& vector)
+{
+    auto result = vector;
+    result.normalize();
+    return result;
+}
+
 template <class U, class T>
 constexpr Vector<U> cast(const Vector<T>& vector)
 {
@@ -107,28 +117,7 @@ constexpr Vector<U> cast(const Vector<T>& vector)
 }
 
 template <class T>
-struct Point {
-    Point() : x(), y() {}
-    Point(T x, T y) : x(std::move(x)), y(std::move(y)) {}
-
-    T x;
-    T y;
-};
-
-template <class U, class V>
-auto operator-(const Point<U>& lhs, const Point<V>& rhs)
-{
-    return Vector<std::common_type_t<U, V>>{lhs.x - rhs.x, lhs.y - rhs.y};
-}
-
-template <class T>
 std::ostream& operator<<(std::ostream& output, const Vector<T>& vector)
 {
     return output << "(" << vector.x << ", " << vector.y << ")";
-}
-
-template <class T>
-std::ostream& operator<<(std::ostream& output, const Point<T>& point)
-{
-    return output << "(" << point.x << ", " << point.y << ")";
 }

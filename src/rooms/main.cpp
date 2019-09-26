@@ -24,8 +24,8 @@ int main()
 
     auto field = Field{};
     field.level.loadFromString(testLevel);
-    field.heroPosition = {7.5f, 1.5f};
-    field.heroDirection = {-1, 1};
+    field.heroBody.position = {7.5f, 1.5f};
+    field.heroBody.rotation = makeRotation(0.7f);
 
     auto view = View{field};
 
@@ -33,27 +33,19 @@ int main()
     auto c = std::cos(0.02f);
 
     auto frameTimer = FrameTimer{config().gameFps};
-    bool done = false;
-    while (!done) {
-        SDL_Event event;
-        while (SDL_PollEvent(&event)) {
-            if (event.type == SDL_QUIT) {
-                done = true;
-            }
-        }
+    while (view.isAlive()) {
+        view.processInput();
 
         auto framesPassed = frameTimer();
+        if (framesPassed == 0) {
+            continue;
+        }
 
         for (auto i = framesPassed; i > 0; i--) {
-            Vector<float> d;
-            d.x = c * field.heroDirection.x - s * field.heroDirection.y;
-            d.y = s * field.heroDirection.x + c * field.heroDirection.y;
-            field.heroDirection = d;
+            field.update(frameTimer.delta());
         }
 
-        if (framesPassed > 0) {
-            view.draw();
-        }
+        view.draw();
     }
 
     SDL_Quit();

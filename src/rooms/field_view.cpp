@@ -8,11 +8,12 @@ FieldView::FieldView(const Field& field)
 
 void FieldView::draw(SDL_Surface* surface)
 {
-    auto directionOrt = ort(_field.heroDirection);
-    auto rayDirection = _field.heroDirection - directionOrt;
+    auto direction = _field.heroBody.rotation * Vector{0, 1};
+    auto directionOrt = ort(direction);
+    auto rayDirection = direction - directionOrt;
     for (int i = 0; i < _resolution.x; i++) {
         auto traceResult = _field.level.trace(
-            _field.heroPosition, _field.heroDirection, rayDirection);
+            _field.heroBody.position, direction, rayDirection);
 
         auto height = static_cast<int>(
             _resolution.y / std::max(traceResult.distance, 1.f));

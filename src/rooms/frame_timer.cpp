@@ -5,10 +5,10 @@ FrameTimer::FrameTimer(int fps)
     , _lastFrame(0)
     , _startTime(Clock::now())
     , _frameDuration(std::chrono::duration_cast<Clock::duration>(
-        std::chrono::duration<double>(_delta)))
+        std::chrono::duration<float>(_delta)))
 { }
 
-double FrameTimer::delta() const
+float FrameTimer::delta() const
 {
     return _delta;
 }
