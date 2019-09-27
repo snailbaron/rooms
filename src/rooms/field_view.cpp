@@ -5,7 +5,14 @@
 
 FieldView::FieldView(Field& field)
     : _field(field)
-{ }
+{
+    _tasks.addTask(
+        SwayTask{
+            3,
+            [this] (float value) {
+                _headHeight = 10 * (value - 0.5f);
+            }});
+}
 
 void FieldView::processInputEvent(const SDL_Event& event)
 {
@@ -35,6 +42,11 @@ void FieldView::processInputEvent(const SDL_Event& event)
     }
 }
 
+void FieldView::update(float delta)
+{
+    _tasks.update(delta);
+}
+
 void FieldView::draw(SDL_Surface* surface)
 {
     auto direction = _field.heroBody.rotation * Vector{0, 1};
@@ -45,11 +57,14 @@ void FieldView::draw(SDL_Surface* surface)
             _field.heroBody.position, direction, rayDirection);
 
         auto height = static_cast<int>(
-            _resolution.y / std::max(traceResult.distance, 1.f));
+            _resolution.y / std::max(traceResult.distance, 0.1f));
         auto offset = (_resolution.y - height) / 2;
+        auto headCorrection = static_cast<int>(
+            _headHeight / std::max(traceResult.distance, 1.f));
 
-        auto topLeft = globalPoint({i, offset});
-        auto bottomRight = globalPoint({i + 1, _resolution.y - offset});
+        auto topLeft = globalPoint({i, offset + headCorrection});
+        auto bottomRight =
+            globalPoint({i + 1, _resolution.y - offset + headCorrection});
         auto size = bottomRight - topLeft;
 
         auto rect = SDL_Rect{topLeft.x, topLeft.y, size.x, size.y};

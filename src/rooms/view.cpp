@@ -39,6 +39,11 @@ void View::processInput()
     }
 }
 
+void View::update(float delta)
+{
+    _fieldView.update(delta);
+}
+
 void View::draw()
 {
     auto windowSurface = SDL_GetWindowSurface(_window.get());

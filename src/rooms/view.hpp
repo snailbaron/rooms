@@ -15,6 +15,7 @@ public:
 
     bool isAlive() const;
     void processInput();
+    void update(float delta);
     void draw();
 
 private:

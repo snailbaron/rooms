@@ -2,6 +2,7 @@
 
 #include "field.hpp"
 #include "geometry.hpp"
+#include "task.hpp"
 
 #include <SDL2/SDL.h>
 
@@ -10,6 +11,7 @@ public:
     FieldView(Field& field);
 
     void processInputEvent(const SDL_Event& event);
+    void update(float delta);
     void draw(SDL_Surface* surface);
 
 private:
@@ -17,8 +19,11 @@ private:
 
     Field& _field;
 
-    Point<int> _position = {10, 10};
-    Vector<int> _size = {800, 600};
+    Point<int> _position = {0, 0};
+    Vector<int> _size = {1024, 768};
 
-    Vector<int> _resolution = {800, 600};
+    Vector<int> _resolution = {1024, 768};
+
+    TaskPool _tasks;
+    float _headHeight = 0;
 };

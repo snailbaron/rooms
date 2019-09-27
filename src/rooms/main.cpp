@@ -45,6 +45,7 @@ int main()
             field.update(frameTimer.delta());
         }
 
+        view.update(frameTimer.delta() * framesPassed);
         view.draw();
     }
 
