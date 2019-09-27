@@ -11,7 +11,7 @@
 
 class View {
 public:
-    View(const Field& field);
+    View(Field& field);
 
     bool isAlive() const;
     void processInput();

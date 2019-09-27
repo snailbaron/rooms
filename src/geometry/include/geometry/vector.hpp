@@ -53,6 +53,16 @@ struct Vector {
         }
     }
 
+    void clip(const T& maxValue)
+    {
+        auto norm = sqrt(x * x + y * y);
+        if (norm != 0 && maxValue < norm) {
+            auto k = maxValue / norm;
+            x *= k;
+            y *= k;
+        }
+    }
+
     T x;
     T y;
 };

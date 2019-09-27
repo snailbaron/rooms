@@ -4,8 +4,10 @@
 #include "geometry.hpp"
 
 struct HeroControls {
-    float moveForward = 0;
-    float moveRight = 0;
+    bool moveForward = false;
+    bool moveBackward = false;
+    bool moveRight = false;
+    bool moveLeft = false;
     float turnLeft = 0;
     bool shoot = false;
 };

@@ -1,7 +1,7 @@
 #include "config.hpp"
 #include "view.hpp"
 
-View::View(const Field& field)
+View::View(Field& field)
     : _fieldView(field)
     , _window(nullptr, SDL_DestroyWindow)
 {
@@ -13,6 +13,8 @@ View::View(const Field& field)
         config().windowHeight,
         0
     ));
+
+    SDL_SetRelativeMouseMode(SDL_TRUE);
 }
 
 bool View::isAlive() const
@@ -31,6 +33,8 @@ void View::processInput()
         if (event.type == SDL_QUIT) {
             _isAlive = false;
             return;
+        } else {
+            _fieldView.processInputEvent(event);
         }
     }
 }

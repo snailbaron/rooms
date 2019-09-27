@@ -7,14 +7,15 @@
 
 class FieldView {
 public:
-    FieldView(const Field& field);
+    FieldView(Field& field);
 
+    void processInputEvent(const SDL_Event& event);
     void draw(SDL_Surface* surface);
 
 private:
     Point<int> globalPoint(const Point<int>& localPoint) const;
 
-    const Field& _field;
+    Field& _field;
 
     Point<int> _position = {10, 10};
     Vector<int> _size = {800, 600};

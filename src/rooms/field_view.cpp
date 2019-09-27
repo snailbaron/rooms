@@ -1,10 +1,39 @@
+#include "config.hpp"
 #include "field_view.hpp"
 
 #include <algorithm>
 
-FieldView::FieldView(const Field& field)
+FieldView::FieldView(Field& field)
     : _field(field)
 { }
+
+void FieldView::processInputEvent(const SDL_Event& event)
+{
+    if (event.type == SDL_KEYDOWN) {
+        if (event.key.keysym.sym == config().moveForwardKey) {
+            _field.heroControls.moveForward = true;
+        } else if (event.key.keysym.sym == config().moveBackwardKey) {
+            _field.heroControls.moveBackward = true;
+        } else if (event.key.keysym.sym == config().moveLeftKey) {
+            _field.heroControls.moveLeft = true;
+        } else if (event.key.keysym.sym == config().moveRightKey) {
+            _field.heroControls.moveRight = true;
+        }
+    } else if (event.type == SDL_KEYUP) {
+        if (event.key.keysym.sym == config().moveForwardKey) {
+            _field.heroControls.moveForward = false;
+        } else if (event.key.keysym.sym == config().moveBackwardKey) {
+            _field.heroControls.moveBackward = false;
+        } else if (event.key.keysym.sym == config().moveLeftKey) {
+            _field.heroControls.moveLeft = false;
+        } else if (event.key.keysym.sym == config().moveRightKey) {
+            _field.heroControls.moveRight = false;
+        }
+    } else if (event.type == SDL_MOUSEMOTION) {
+        _field.heroControls.turnLeft -=
+            event.motion.xrel * config().mouseSensitivity;
+    }
+}
 
 void FieldView::draw(SDL_Surface* surface)
 {
