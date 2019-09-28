@@ -23,6 +23,12 @@ struct Point {
     T y;
 };
 
+template <class U, class V, class = enable_if_have_common_type_t<U, V>>
+auto operator+(const Point<U>& lhs, const Vector<V>& rhs)
+{
+    return Point<std::common_type_t<U, V>>{lhs.x + rhs.x, lhs.y + rhs.y};
+}
+
 template <class T>
 std::ostream& operator<<(std::ostream& output, const Point<T>& point)
 {

@@ -10,7 +10,12 @@
 template <class T>
 struct Vector {
     constexpr Vector() : x(), y() {}
+
     constexpr Vector(T x, T y) : x(std::move(x)), y(std::move(y)) {}
+
+    template <class U, class V, class = std::enable_if_t<
+        std::is_convertible_v<U, T> && std::is_convertible_v<V, T>>>
+    constexpr Vector(U x, V y) : x(std::move(x)), y(std::move(y)) {}
 
     template <class U, class = std::enable_if_t<std::is_convertible_v<U, T>>>
     Vector& operator+=(const Vector<U>& rhs)
@@ -106,6 +111,12 @@ std::common_type_t<U, V> dot(const Vector<U>& lhs, const Vector<V>& rhs)
     return lhs.x * rhs.x + lhs.y * rhs.y;
 }
 
+template <class U, class V>
+std::common_type_t<U, V> cross(const Vector<U>& lhs, const Vector<V>& rhs)
+{
+    return lhs.x * rhs.y - lhs.y * rhs.x;
+}
+
 template <class T>
 Vector<T> ort(const Vector<T>& vector)
 {
@@ -118,6 +129,18 @@ Vector<T> normalized(const Vector<T>& vector)
     auto result = vector;
     result.normalize();
     return result;
+}
+
+template <class T>
+T norm(const Vector<T>& vector)
+{
+    return std::sqrt(vector.x * vector.x + vector.y * vector.y);
+}
+
+template <class T>
+Vector<T> reflect(const Vector<T>& vector, const Vector<T>& normal)
+{
+    return vector + 2 * dot(vector, normal) * normal;
 }
 
 template <class U, class T>

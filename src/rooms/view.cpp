@@ -7,14 +7,29 @@ View::View(Field& field)
 {
     _window.reset(SDL_CreateWindow(
         config().windowTitle.c_str(),
-        SDL_WINDOWPOS_CENTERED,
-        SDL_WINDOWPOS_CENTERED,
+        SDL_WINDOWPOS_UNDEFINED,
+        SDL_WINDOWPOS_UNDEFINED,
         config().windowWidth,
         config().windowHeight,
-        0
+        //SDL_WINDOW_FULLSCREEN_DESKTOP |
+            //SDL_WINDOW_INPUT_GRABBED |
+            SDL_WINDOW_BORDERLESS
     ));
 
     SDL_SetRelativeMouseMode(SDL_TRUE);
+
+    int windowWidth;
+    int windowHeight;
+    SDL_GetWindowSize(_window.get(), &windowWidth, &windowHeight);
+
+    float fov = 0.7f;
+    float vertFov = fov * windowHeight / windowWidth;
+
+    _fieldView
+        .position(0, 0)
+        .size(windowWidth, windowHeight)
+        .resolution(windowWidth, windowHeight)
+        .fov(fov, vertFov);
 }
 
 bool View::isAlive() const
@@ -28,8 +43,7 @@ void View::processInput()
         return;
     }
 
-    SDL_Event event;
-    while (SDL_PollEvent(&event)) {
+    for (SDL_Event event; SDL_PollEvent(&event); ) {
         if (event.type == SDL_QUIT) {
             _isAlive = false;
             return;

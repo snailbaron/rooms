@@ -4,8 +4,6 @@
 #include <fstream>
 #include <limits>
 
-namespace fs = std::filesystem;
-
 int sign(float value)
 {
     if (value > 0) {
@@ -17,24 +15,6 @@ int sign(float value)
     }
 }
 
-void Level::loadFromStream(std::istream& input)
-{
-    size_t x = 0;
-    size_t y = 0;
-    char c;
-    for (input.get(c); input.good(); input.get(c)) {
-        if (c == '#') {
-            _cells(x, y) = Cell::Full;
-            x++;
-        } else if (c == '\n') {
-            x = 0;
-            y++;
-        }
-    }
-
-    _cells.inverseByY();
-}
-
 void Level::loadFromString(std::string_view string)
 {
     size_t x = 0;
@@ -44,8 +24,11 @@ void Level::loadFromString(std::string_view string)
             x = 0;
             y++;
         } else {
-            if (c == '#') {
-                _cells(x, y) = Cell::Full;
+            switch (c) {
+                case '#': _cells(x, y) = Cell::Full; break;
+                case 'o': _cells(x, y) = Cell::SmallColumn; break;
+                case 'O': _cells(x, y) = Cell::LargeColumn; break;
+                default: _cells(x, y) = Cell::Empty; break;
             }
             x++;
         }
@@ -53,13 +36,7 @@ void Level::loadFromString(std::string_view string)
     _cells.inverseByY();
 }
 
-void Level::loadFromFile(const fs::path& path)
-{
-    auto stream = std::ifstream{path};
-    loadFromStream(stream);
-}
-
-TraceResult Level::trace(
+TraceResult<float> Level::trace(
     const Point<float>& origin,
     Vector<float> lookDirection,
     Vector<float> rayDirection) const
@@ -67,52 +44,65 @@ TraceResult Level::trace(
     lookDirection.normalize();
     rayDirection.normalize();
 
-    float dx = rayDirection.x == 0 ?
-        std::numeric_limits<float>::infinity() : std::abs(1 / rayDirection.x);
-    float dy = rayDirection.y == 0 ?
-        std::numeric_limits<float>::infinity() : std::abs(1 / rayDirection.y);
+    float delta[2] = {
+        rayDirection.x == 0 ?
+            std::numeric_limits<float>::infinity() :
+            std::abs(1 / rayDirection.x),
+        rayDirection.y == 0 ?
+            std::numeric_limits<float>::infinity() :
+            std::abs(1 / rayDirection.y)
+    };
 
-    int stepX = sign(rayDirection.x);
-    int stepY = sign(rayDirection.y);
-    int cellX = static_cast<int>(origin.x);
-    int cellY = static_cast<int>(origin.y);
+    int step[2] = {sign(rayDirection.x), sign(rayDirection.y)};
+    int cell[2] = {static_cast<int>(origin.x), static_cast<int>(origin.y)};
 
     auto cellRelativeOrigin = normalizedCellPoint(origin);
 
-    float nextXDistance = rayDirection.x > 0 ?
-        dx * (1 - cellRelativeOrigin.x) : dx * cellRelativeOrigin.x;
-    float nextYDistance = rayDirection.y > 0 ?
-        dy * (1 - cellRelativeOrigin.y) : dy * cellRelativeOrigin.y;
+    float nextCellDistance[2] = {
+        rayDirection.x > 0 ?
+            delta[0] * (1 - cellRelativeOrigin.x) :
+            delta[0] * cellRelativeOrigin.x,
+        rayDirection.y > 0 ?
+            delta[1] * (1 - cellRelativeOrigin.y) :
+            delta[1] * cellRelativeOrigin.y
+    };
 
     for (;;) {
-        if (nextXDistance < nextYDistance) {
-            cellX += stepX;
-        } else {
-            cellY += stepY;
+        size_t index = nextCellDistance[0] < nextCellDistance[1] ? 0 : 1;
+
+        cell[index] += step[index];
+        for (size_t i = 0; i < 2; i++) {
+            if (cell[i] < 0 || cell[i] >= static_cast<int>(_cells.width())) {
+                return {std::numeric_limits<float>::infinity(), {}};
+            }
         }
 
-        if (cellX < 0 || cellX >= _cells.width() ||
-                cellY < 0 || cellY >= _cells.width()) {
-            return {std::numeric_limits<float>::infinity(), false};
+        if (_cells.at(cell[0], cell[1]) == Cell::Full) {
+            return {
+                nextCellDistance[index] * dot(lookDirection, rayDirection),
+                index == 0 ?
+                    Vector<float>{-step[0], 0.f} :
+                    Vector<float>{0.f, -step[1]}
+            };
+        } else if (_cells.at(cell[0], cell[1]) == Cell::SmallColumn ||
+                _cells.at(cell[0], cell[1]) == Cell::LargeColumn) {
+            auto cellCenter = Point<float>{
+                cell[0] * _cellSize + 0.5f, cell[1] * _cellSize + 0.5f};
+            auto traceResult = traceCircle(
+                origin,
+                rayDirection,
+                cellCenter,
+                _cells.at(cell[0], cell[1]) == Cell::SmallColumn ?
+                    _smallColumnRadius : _largeColumnRadius);
+            if (traceResult) {
+                return {
+                    traceResult.distance * dot(lookDirection, rayDirection),
+                    traceResult.normal
+                };
+            }
         }
 
-        if (nextXDistance < nextYDistance) {
-            if (_cells.at(cellX, cellY) == Cell::Full) {
-                return {
-                    nextXDistance * dot(lookDirection, rayDirection),
-                    true
-                };
-            }
-            nextXDistance += dx;
-        } else {
-            if (_cells.at(cellX, cellY) == Cell::Full) {
-                return {
-                    nextYDistance * dot(lookDirection, rayDirection),
-                    false
-                };
-            }
-            nextYDistance += dy;
-        }
+        nextCellDistance[index] += delta[index];
     }
 }
 
@@ -130,4 +120,9 @@ Point<int> Level::pointCell(const Point<float>& levelPoint) const
         static_cast<int>(levelPoint.x),
         static_cast<int>(levelPoint.y)
     };
+}
+
+Point<float> Level::cellCenter(size_t x, size_t y) const
+{
+    return {_cellSize * (x + 0.5f), _cellSize * (y + 0.5f)};
 }

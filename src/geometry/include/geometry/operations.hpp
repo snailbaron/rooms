@@ -12,6 +12,12 @@ auto operator-(const Point<U>& lhs, const Point<V>& rhs)
 }
 
 template <class U, class V, class = enable_if_have_common_type_t<U, V>>
+auto operator-(const Vector<U>& lhs, const Point<V>& rhs)
+{
+    return Vector<std::common_type_t<U, V>>{lhs.x - rhs.x, lhs.y - rhs.y};
+}
+
+template <class U, class V, class = enable_if_have_common_type_t<U, V>>
 auto operator*(const Matrix<U>& matrix, const Vector<V>& vector)
 {
     return Vector<std::common_type_t<U, V>>{

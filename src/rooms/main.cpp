@@ -8,12 +8,12 @@
 constexpr char testLevel[] =
     "##########\n"
     "#.....#..#\n"
-    "#..#.###.#\n"
-    "#..###.#.#\n"
-    "#.##...#.#\n"
-    "#..###.#.#\n"
-    "#....#....\n"
-    "#..###...#\n"
+    "#..O...#.#\n"
+    "#......#.#\n"
+    "#........#\n"
+    "#........#\n"
+    "#..#..o...\n"
+    "#.#.......\n"
     "#.........\n"
     "#####...##\n"
 ;
@@ -28,9 +28,6 @@ int main()
     field.heroBody.rotation = makeRotation(0.7f);
 
     auto view = View{field};
-
-    auto s = std::sin(0.02f);
-    auto c = std::cos(0.02f);
 
     auto frameTimer = FrameTimer{config().gameFps};
     while (view.isAlive()) {

@@ -10,7 +10,7 @@ FieldView::FieldView(Field& field)
         SwayTask{
             3,
             [this] (float value) {
-                _headHeight = 10 * (value - 0.5f);
+                _headHeight = 100 * (value - 0.5f);
             }});
 }
 
@@ -51,16 +51,17 @@ void FieldView::draw(SDL_Surface* surface)
 {
     auto direction = _field.heroBody.rotation * Vector{0, 1};
     auto directionOrt = ort(direction);
-    auto rayDirection = direction - directionOrt;
+    auto rayDirection = direction - directionOrt * _horizontalFovRatio;
     for (int i = 0; i < _resolution.x; i++) {
         auto traceResult = _field.level.trace(
             _field.heroBody.position, direction, rayDirection);
 
-        auto height = static_cast<int>(
-            _resolution.y / std::max(traceResult.distance, 0.1f));
+        auto height = static_cast<int>(_resolution.y * _objectHeight /
+            (2 * _verticalFovRatio * std::max(traceResult.distance, 0.1f)));
         auto offset = (_resolution.y - height) / 2;
         auto headCorrection = static_cast<int>(
-            _headHeight / std::max(traceResult.distance, 1.f));
+            _headHeight /
+                (2 * _verticalFovRatio * std::max(traceResult.distance, 1.f)));
 
         auto topLeft = globalPoint({i, offset + headCorrection});
         auto bottomRight =
@@ -68,16 +69,20 @@ void FieldView::draw(SDL_Surface* surface)
         auto size = bottomRight - topLeft;
 
         auto rect = SDL_Rect{topLeft.x, topLeft.y, size.x, size.y};
+        auto brightness =
+            std::abs(dot(traceResult.normal, Vector<float>{0, 1}));
+
         SDL_FillRect(
             surface,
             &rect,
             SDL_MapRGB(
                 surface->format,
-                50,
-                traceResult.xWall ? 100 : 150,
-                50));
+                90 + 50 * brightness,
+                100 + 50 * brightness,
+                80 + 50 * brightness));
 
-        rayDirection += directionOrt * (2.f / _resolution.x);
+        rayDirection += directionOrt *
+            (2.f * _horizontalFovRatio / _resolution.x);
     }
 }
 
