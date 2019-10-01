@@ -1,4 +1,5 @@
 #include "field.hpp"
+#include "geometry.hpp"
 
 namespace {
 
@@ -16,7 +17,7 @@ void Body::update(float delta)
 void Field::update(float delta)
 {
     if (heroControls.turnLeft != 0) {
-        auto rotation = makeRotation(heroControls.turnLeft);
+        auto rotation = geometry::makeRotation(heroControls.turnLeft);
         heroBody.rotation *= rotation;
         heroControls.turnLeft = 0;
     }
@@ -24,7 +25,7 @@ void Field::update(float delta)
     float moveRight = heroControls.moveRight - heroControls.moveLeft;
     float moveForward = heroControls.moveForward - heroControls.moveBackward;
 
-    auto localForceDirection = normalized(Vector{moveRight, moveForward});
+    auto localForceDirection = normalize(Vector{moveRight, moveForward});
     auto forceDirection = heroBody.rotation * localForceDirection;
 
     auto acceleration = ACCELERATION_FORCE * forceDirection;

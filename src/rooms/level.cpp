@@ -70,9 +70,9 @@ void Level::loadFromFile(const std::filesystem::path& filePath)
 }
 
 std::vector<Level::Hit> Level::trace(
-    const Point<float>& origin,
-    Vector<float> lookDirection,
-    Vector<float> rayDirection) const
+    const Point& origin,
+    Vector lookDirection,
+    Vector rayDirection) const
 {
     lookDirection.normalize();
     rayDirection.normalize();
@@ -111,7 +111,7 @@ std::vector<Level::Hit> Level::trace(
             if (cell[i] < 0 || cell[i] >= static_cast<int>(_cells.width())) {
                 hits.push_back({
                     std::numeric_limits<float>::infinity(),
-                    Vector<float>{},
+                    Vector{},
                     Cell::Empty});
                 return hits;
             }
@@ -124,8 +124,8 @@ std::vector<Level::Hit> Level::trace(
             hits.push_back({
                 nextCellDistance[index] * dot(lookDirection, rayDirection),
                 index == 0 ?
-                    Vector<float>{-step[0], 0.f} :
-                    Vector<float>{0.f, -step[1]},
+                    Vector{-step[0], 0.f} :
+                    Vector{0.f, -step[1]},
                 Cell::Empty});
         }
 
@@ -133,8 +133,8 @@ std::vector<Level::Hit> Level::trace(
             hits.push_back({
                 nextCellDistance[index] * dot(lookDirection, rayDirection),
                 index == 0 ?
-                    Vector<float>{-step[0], 0.f} :
-                    Vector<float>{0.f, -step[1]},
+                    Vector{-step[0], 0.f} :
+                    Vector{0.f, -step[1]},
                 Cell::Full});
             return hits;
         } else if (cellType == Cell::HalfHeight ||
@@ -142,12 +142,12 @@ std::vector<Level::Hit> Level::trace(
             hits.push_back({
                 nextCellDistance[index] * dot(lookDirection, rayDirection),
                 index == 0 ?
-                    Vector<float>{-step[0], 0.f} :
-                    Vector<float>{0.f, -step[1]},
+                    Vector{-step[0], 0.f} :
+                    Vector{0.f, -step[1]},
                 cellType});
         } else if (cellType == Cell::SmallColumn ||
                 cellType == Cell::LargeColumn) {
-            auto cellCenter = Point<float>{
+            auto cellCenter = Point{
                 cell[0] * _cellSize + 0.5f, cell[1] * _cellSize + 0.5f};
             auto traceResult = traceCircle(
                 origin,
@@ -168,7 +168,7 @@ std::vector<Level::Hit> Level::trace(
     }
 }
 
-Point<float> Level::normalizedCellPoint(const Point<float>& levelPoint) const
+Point Level::normalizedCellPoint(const Point& levelPoint) const
 {
     return {
         std::fmod(levelPoint.x, _cellSize) / _cellSize,
@@ -176,15 +176,7 @@ Point<float> Level::normalizedCellPoint(const Point<float>& levelPoint) const
     };
 }
 
-Point<int> Level::pointCell(const Point<float>& levelPoint) const
-{
-    return {
-        static_cast<int>(levelPoint.x),
-        static_cast<int>(levelPoint.y)
-    };
-}
-
-Point<float> Level::cellCenter(size_t x, size_t y) const
+Point Level::cellCenter(size_t x, size_t y) const
 {
     return {_cellSize * (x + 0.5f), _cellSize * (y + 0.5f)};
 }

@@ -6,6 +6,8 @@
 #include <cmath>
 #include <limits>
 
+namespace geometry {
+
 template <class T>
 struct TraceResult {
     operator bool() const
@@ -33,8 +35,7 @@ TraceResult<T> traceCircle(
     auto incomingVector = -std::sqrt(r * r - d * d) * lookDirection;
     auto radialVector = centerToLineVector + incomingVector;
 
-    return {
-        norm(center + radialVector - origin),
-        normalized(radialVector)
-    };
+    return {norm(center + radialVector - origin), normalize(radialVector)};
 }
+
+} // namespace geometry

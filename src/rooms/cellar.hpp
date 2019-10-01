@@ -37,12 +37,17 @@
 template <class T>
 class Cellar {
 public:
-    const T& at(size_t x, size_t y) const
+    const T& at(int x, int y) const
     {
-        return _data.at(index(x, y));
+        auto i = index(x, y);
+        if (i >= 0 && i < _data.size()) {
+            return _data[i];
+        } else {
+            return defaultValue;
+        }
     }
 
-    T& operator()(size_t x, size_t y)
+    T& operator()(int x, int y)
     {
         auto w = std::max(x, y) + 1;
         if (w * w >= _data.size()) {
@@ -53,15 +58,15 @@ public:
         return _data[index(x, y)];
     }
 
-    size_t width() const
+    int width() const
     {
         return _width;
     }
 
     void inverseByX()
     {
-        for (size_t i = 0; i < _width / 2; i++) {
-            for (size_t j = 0; j < _width; j++) {
+        for (int i = 0; i < _width / 2; i++) {
+            for (int j = 0; j < _width; j++) {
                 std::swap((*this)(i, j), (*this)(_width - 1 - i, j));
             }
         }
@@ -69,15 +74,17 @@ public:
 
     void inverseByY()
     {
-        for (size_t i = 0; i < _width; i++) {
-            for (size_t j = 0; j < _width / 2; j++) {
+        for (int i = 0; i < _width; i++) {
+            for (int j = 0; j < _width / 2; j++) {
                 std::swap((*this)(i, j), (*this)(i, _width - 1 - j));
             }
         }
     }
 
 private:
-    size_t index(size_t x, size_t y) const
+    static const T defaultValue;
+
+    size_t index(int x, int y) const
     {
         if (x >= y) {
             return x * x + y * 2;
@@ -87,5 +94,8 @@ private:
     }
 
     std::vector<T> _data;
-    size_t _width = 0;
+    int _width = 0;
 };
+
+template <class T>
+const T Cellar<T>::defaultValue = T{};

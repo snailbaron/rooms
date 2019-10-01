@@ -2,6 +2,7 @@
 #include "frame_timer.hpp"
 #include "field.hpp"
 #include "view.hpp"
+#include "geometry.hpp"
 
 #include <SDL2/SDL.h>
 
@@ -9,19 +10,6 @@
 #include <iostream>
 
 namespace fs = std::filesystem;
-
-//constexpr char testLevel[] =
-//    "##########\n"
-//    "#.....#..#\n"
-//    "#..O...#.#\n"
-//    "#......#.#\n"
-//    "#........#\n"
-//    "#........#\n"
-//    "#..#..o...\n"
-//    "#.#.......\n"
-//    "#.........\n"
-//    "#####...##\n"
-//;
 
 int main(int /*argc*/, char* argv[])
 {
@@ -34,7 +22,7 @@ int main(int /*argc*/, char* argv[])
     auto field = Field{};
     field.level.loadFromFile(testLevelPath);
     field.heroBody.position = {7.5f, 1.5f};
-    field.heroBody.rotation = makeRotation(0.7f);
+    field.heroBody.rotation = geometry::makeRotation(0.7f);
 
     auto view = View{field};
 

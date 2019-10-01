@@ -87,7 +87,7 @@ void FieldView::draw(SDL_Surface* surface)
 
             auto rect = SDL_Rect{topLeft.x, topLeft.y, size.x, size.y};
             auto brightness =
-                std::abs(dot(hit.normal, Vector<float>{0, 1}));
+                std::abs(dot(hit.normal, Vector{0, 1}));
             if (hit.cell == Cell::Empty) {
                 brightness = -0.5f;
             }
@@ -116,12 +116,7 @@ void FieldView::draw(SDL_Surface* surface)
     }
 }
 
-Point<int> FieldView::globalPoint(const Point<int>& localPoint) const
+ScreenPoint FieldView::globalPoint(const ScreenPoint& localPoint) const
 {
-    return {
-        _position.x + static_cast<int>(
-            std::round(1.f * _size.x * localPoint.x / _resolution.x)),
-        _position.y + static_cast<int>(
-            std::round(1.f * _size.y * localPoint.y / _resolution.y))
-    };
+    return recalculatePoint(localPoint, _resolution, _size) + _offset;
 }

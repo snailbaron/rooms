@@ -2,7 +2,9 @@
 
 #include "field.hpp"
 #include "geometry.hpp"
+#include "screen_geometry.hpp"
 #include "task.hpp"
+#include "types.hpp"
 
 #include <SDL2/SDL.h>
 
@@ -16,7 +18,7 @@ public:
 
     FieldView& position(int x, int y)
     {
-        _position = {x, y};
+        _offset = {x, y};
         return *this;
     }
 
@@ -42,13 +44,13 @@ public:
 private:
     static constexpr float _objectHeight = 2.f;
 
-    Point<int> globalPoint(const Point<int>& localPoint) const;
+    ScreenPoint globalPoint(const ScreenPoint& localPoint) const;
 
     Field& _field;
 
-    Point<int> _position = {0, 0};
-    Vector<int> _size = {1024, 768};
-    Vector<int> _resolution = {1024, 768};
+    ScreenOffset _offset = {0, 0};
+    ScreenSize _size = {1024, 768};
+    ScreenSize _resolution = {1024, 768};
     float _horizontalFovRatio = 1.f;
     float _verticalFovRatio = 1.f;
 

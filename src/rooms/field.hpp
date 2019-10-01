@@ -1,7 +1,7 @@
 #pragma once
 
 #include "level.hpp"
-#include "geometry.hpp"
+#include "types.hpp"
 
 struct HeroControls {
     bool moveForward = false;
@@ -15,9 +15,9 @@ struct HeroControls {
 struct Body {
     void update(float delta);
 
-    Point<float> position;
-    Vector<float> velocity;
-    Matrix<float> rotation;
+    Point position;
+    Vector velocity;
+    Matrix rotation;
 };
 
 class Field {

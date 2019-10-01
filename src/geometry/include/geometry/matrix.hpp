@@ -7,6 +7,8 @@
 #include <utility>
 #include <type_traits>
 
+namespace geometry {
+
 template <class T>
 class Matrix {
 public:
@@ -75,3 +77,5 @@ Matrix<T> makeRotation(const T& angle)
     auto c = std::cos(angle);
     return {c, -s, s, c};
 }
+
+} // namespace geometry
