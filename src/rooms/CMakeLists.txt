@@ -10,7 +10,7 @@ add_executable(rooms
 
 target_link_libraries(rooms PRIVATE geometry)
 
-target_link_libraries(rooms PRIVATE SDL2::SDL2)
+target_link_libraries(rooms PRIVATE SDL2)
 
 add_custom_command(
     TARGET rooms
