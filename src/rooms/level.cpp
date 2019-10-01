@@ -3,6 +3,47 @@
 #include <cmath>
 #include <fstream>
 #include <limits>
+#include <istream>
+#include <sstream>
+
+#include <iostream>
+
+namespace {
+
+Cellar<Cell> readCellsFromStream(std::istream& input)
+{
+    auto cells = Cellar<Cell>{};
+
+    size_t x = 0;
+    size_t y = 0;
+    char c;
+    for (input.get(c); input.good(); input.get(c)) {
+        switch (c) {
+            case '\n': x = 0; y++; break;
+
+            case '#': cells(x, y) = Cell::Full;        x++; break;
+            case 'o': cells(x, y) = Cell::SmallColumn; x++; break;
+            case 'O': cells(x, y) = Cell::LargeColumn; x++; break;
+            case '.': cells(x, y) = Cell::Empty;       x++; break;
+            case '%': cells(x, y) = Cell::HalfHeight;  x++; break;
+            case 'T': cells(x, y) = Cell::TallHeight;  x++; break;
+            case ' ': break;
+
+            default:
+                std::cerr <<
+                    "unknown map symbol interpreted as empty cell: " << c <<
+                    "\n";
+                cells(x, y) = Cell::Empty;
+                x++;
+                break;
+        }
+    }
+    cells.inverseByY();
+
+    return cells;
+}
+
+}
 
 int sign(float value)
 {
@@ -15,28 +56,20 @@ int sign(float value)
     }
 }
 
-void Level::loadFromString(std::string_view string)
+void Level::loadFromString(const std::string& string)
 {
-    size_t x = 0;
-    size_t y = 0;
-    for (char c : string) {
-        if (c == '\n') {
-            x = 0;
-            y++;
-        } else {
-            switch (c) {
-                case '#': _cells(x, y) = Cell::Full; break;
-                case 'o': _cells(x, y) = Cell::SmallColumn; break;
-                case 'O': _cells(x, y) = Cell::LargeColumn; break;
-                default: _cells(x, y) = Cell::Empty; break;
-            }
-            x++;
-        }
-    }
-    _cells.inverseByY();
+    auto stream = std::istringstream{string};
+    _cells = readCellsFromStream(stream);
 }
 
-TraceResult<float> Level::trace(
+void Level::loadFromFile(const std::filesystem::path& filePath)
+{
+    auto stream = std::ifstream{filePath};
+    stream.exceptions(std::ifstream::badbit);
+    _cells = readCellsFromStream(stream);
+}
+
+std::vector<Level::Hit> Level::trace(
     const Point<float>& origin,
     Vector<float> lookDirection,
     Vector<float> rayDirection) const
@@ -67,25 +100,53 @@ TraceResult<float> Level::trace(
             delta[1] * cellRelativeOrigin.y
     };
 
+    std::vector<Hit> hits;
+    auto prevCellType = Cell::Empty;
+    auto cellType = _cells.at(cell[0], cell[1]);
     for (;;) {
         size_t index = nextCellDistance[0] < nextCellDistance[1] ? 0 : 1;
 
         cell[index] += step[index];
         for (size_t i = 0; i < 2; i++) {
             if (cell[i] < 0 || cell[i] >= static_cast<int>(_cells.width())) {
-                return {std::numeric_limits<float>::infinity(), {}};
+                hits.push_back({
+                    std::numeric_limits<float>::infinity(),
+                    Vector<float>{},
+                    Cell::Empty});
+                return hits;
             }
         }
 
-        if (_cells.at(cell[0], cell[1]) == Cell::Full) {
-            return {
+        prevCellType = cellType;
+        cellType = _cells.at(cell[0], cell[1]);
+
+        if (prevCellType == Cell::HalfHeight) {
+            hits.push_back({
                 nextCellDistance[index] * dot(lookDirection, rayDirection),
                 index == 0 ?
                     Vector<float>{-step[0], 0.f} :
-                    Vector<float>{0.f, -step[1]}
-            };
-        } else if (_cells.at(cell[0], cell[1]) == Cell::SmallColumn ||
-                _cells.at(cell[0], cell[1]) == Cell::LargeColumn) {
+                    Vector<float>{0.f, -step[1]},
+                Cell::Empty});
+        }
+
+        if (cellType == Cell::Full) {
+            hits.push_back({
+                nextCellDistance[index] * dot(lookDirection, rayDirection),
+                index == 0 ?
+                    Vector<float>{-step[0], 0.f} :
+                    Vector<float>{0.f, -step[1]},
+                Cell::Full});
+            return hits;
+        } else if (cellType == Cell::HalfHeight ||
+                cellType == Cell::TallHeight) {
+            hits.push_back({
+                nextCellDistance[index] * dot(lookDirection, rayDirection),
+                index == 0 ?
+                    Vector<float>{-step[0], 0.f} :
+                    Vector<float>{0.f, -step[1]},
+                cellType});
+        } else if (cellType == Cell::SmallColumn ||
+                cellType == Cell::LargeColumn) {
             auto cellCenter = Point<float>{
                 cell[0] * _cellSize + 0.5f, cell[1] * _cellSize + 0.5f};
             auto traceResult = traceCircle(
@@ -95,10 +156,11 @@ TraceResult<float> Level::trace(
                 _cells.at(cell[0], cell[1]) == Cell::SmallColumn ?
                     _smallColumnRadius : _largeColumnRadius);
             if (traceResult) {
-                return {
+                hits.push_back({
                     traceResult.distance * dot(lookDirection, rayDirection),
-                    traceResult.normal
-                };
+                    traceResult.normal,
+                    cellType});
+                return hits;
             }
         }
 

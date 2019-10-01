@@ -3,6 +3,8 @@
 
 #include <algorithm>
 
+#include <iostream>
+
 FieldView::FieldView(Field& field)
     : _field(field)
 {
@@ -53,33 +55,61 @@ void FieldView::draw(SDL_Surface* surface)
     auto directionOrt = ort(direction);
     auto rayDirection = direction - directionOrt * _horizontalFovRatio;
     for (int i = 0; i < _resolution.x; i++) {
-        auto traceResult = _field.level.trace(
+        auto hits = _field.level.trace(
             _field.heroBody.position, direction, rayDirection);
 
-        auto height = static_cast<int>(_resolution.y * _objectHeight /
-            (2 * _verticalFovRatio * std::max(traceResult.distance, 0.1f)));
-        auto offset = (_resolution.y - height) / 2;
-        auto headCorrection = static_cast<int>(
-            _headHeight /
-                (2 * _verticalFovRatio * std::max(traceResult.distance, 1.f)));
+        for (auto hitIterator = hits.rbegin(); hitIterator != hits.rend();
+                ++hitIterator) {
+            const auto& hit = *hitIterator;
 
-        auto topLeft = globalPoint({i, offset + headCorrection});
-        auto bottomRight =
-            globalPoint({i + 1, _resolution.y - offset + headCorrection});
-        auto size = bottomRight - topLeft;
+            auto height = static_cast<int>(_resolution.y * _objectHeight /
+                (2 * _verticalFovRatio * std::max(hit.distance, 0.1f)));
+            auto offset = (_resolution.y - height) / 2;
+            auto headCorrection = static_cast<int>(
+                _headHeight /
+                    (2 * _verticalFovRatio *
+                        std::max(hit.distance, 1.f)));
+            auto heightCorrection = 0;
+            if (hit.cell == Cell::HalfHeight || hit.cell == Cell::Empty) {
+                heightCorrection = static_cast<int>(height * 0.8f);
+            } else if (hit.cell == Cell::TallHeight) {
+                heightCorrection = static_cast<int>(height * 0.3f);
+            }
 
-        auto rect = SDL_Rect{topLeft.x, topLeft.y, size.x, size.y};
-        auto brightness =
-            std::abs(dot(traceResult.normal, Vector<float>{0, 1}));
+            auto topLeft =
+                globalPoint({i, offset + headCorrection + heightCorrection});
+            auto bottomRight =
+                globalPoint({i + 1, _resolution.y - offset + headCorrection});
+            if (hit.cell == Cell::Empty) {
+                bottomRight.y = _resolution.y;
+            }
+            auto size = bottomRight - topLeft;
 
-        SDL_FillRect(
-            surface,
-            &rect,
-            SDL_MapRGB(
-                surface->format,
-                90 + 50 * brightness,
-                100 + 50 * brightness,
-                80 + 50 * brightness));
+            auto rect = SDL_Rect{topLeft.x, topLeft.y, size.x, size.y};
+            auto brightness =
+                std::abs(dot(hit.normal, Vector<float>{0, 1}));
+            if (hit.cell == Cell::Empty) {
+                brightness = -0.5f;
+            }
+
+            SDL_FillRect(
+                surface,
+                &rect,
+                SDL_MapRGB(
+                    surface->format,
+                    90 + 50 * brightness,
+                    100 + 50 * brightness,
+                    80 + 50 * brightness));
+
+            if (hit.cell == Cell::HalfHeight) {
+                rect.y += rect.h;
+                rect.h = _resolution.y - rect.y;
+                SDL_FillRect(
+                    surface,
+                    &rect,
+                    SDL_MapRGB(surface->format, 30, 30, 30));
+            }
+        }
 
         rayDirection += directionOrt *
             (2.f * _horizontalFovRatio / _resolution.x);

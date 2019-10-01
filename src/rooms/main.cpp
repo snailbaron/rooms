@@ -5,25 +5,34 @@
 
 #include <SDL2/SDL.h>
 
-constexpr char testLevel[] =
-    "##########\n"
-    "#.....#..#\n"
-    "#..O...#.#\n"
-    "#......#.#\n"
-    "#........#\n"
-    "#........#\n"
-    "#..#..o...\n"
-    "#.#.......\n"
-    "#.........\n"
-    "#####...##\n"
-;
+#include <filesystem>
+#include <iostream>
 
-int main()
+namespace fs = std::filesystem;
+
+//constexpr char testLevel[] =
+//    "##########\n"
+//    "#.....#..#\n"
+//    "#..O...#.#\n"
+//    "#......#.#\n"
+//    "#........#\n"
+//    "#........#\n"
+//    "#..#..o...\n"
+//    "#.#.......\n"
+//    "#.........\n"
+//    "#####...##\n"
+//;
+
+int main(int /*argc*/, char* argv[])
 {
+    const auto testLevelPath =
+        fs::absolute(argv[0]).parent_path() / "data" / "levels" / "test.lev";
+    std::cerr << "test level path: '" << testLevelPath << "'\n";
+
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS);
 
     auto field = Field{};
-    field.level.loadFromString(testLevel);
+    field.level.loadFromFile(testLevelPath);
     field.heroBody.position = {7.5f, 1.5f};
     field.heroBody.rotation = makeRotation(0.7f);
 

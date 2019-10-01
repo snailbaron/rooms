@@ -66,7 +66,7 @@ void View::draw()
     SDL_FillRect(
         windowSurface,
         &windowRect,
-        SDL_MapRGB(windowSurface->format, 10, 10, 10));
+        SDL_MapRGB(windowSurface->format, 30, 30, 30));
 
     _fieldView.draw(windowSurface);
 

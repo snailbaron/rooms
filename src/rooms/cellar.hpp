@@ -4,19 +4,34 @@
 #include <vector>
 
 /**
- *  Y
+ * Cellar - a dynamic 2-dimensional array for storing a square of values.
  *
- *  ^
- *  |
- *  +----+----+----+----+
- *  | 10 | 12 | 14 | 15 |
- *  +----+----+----+----|
- *  |  5 |  7 |  8 | 13 |
- *  +----+----+----+----+
- *  |  2 |  3 |  6 | 11 |
- *  +----+----+----+----+
- *  |  0 |  1 |  4 |  9 |
- *  +----+----+----+----+-> X
+ * Internally, elements are stored in a regular 1-dimensional dynamic array. An
+ * element with indices (x, y) is placed into this 1-dimensional array at
+ * position i, calculated by formula:
+ *
+ *               ⎧ x² + 2y, x ⩾ y
+ *     i(x, y) = ⎨
+ *               ⎩ y² + 2x + 1, x < y
+ *
+ * The table below shows positions of elements with various (x, y) indices in
+ * the internal array:
+ *
+ *     Y
+ *
+ *     ├────┼────┼────┼────┼
+ *     │ 10 │ 12 │ 14 │ 15 │
+ *     ├────┼────┼────┼────┼
+ *     │  5 │  7 │  8 │ 13 │
+ *     ├────┼────┼────┼────┼
+ *     │  2 │  3 │  6 │ 11 │
+ *     ├────┼────┼────┼────┼
+ *     │  0 │  1 │  4 │  9 │
+ *     └────┴────┴────┴────┴ X
+ *
+ * When an element is inserted at (x, y), the array is extended to hold a square
+ * of m² values, where m = max{x, y}. The elements not yet inserted are
+ * initialized with default values.
  */
 
 template <class T>

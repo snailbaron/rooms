@@ -4,7 +4,7 @@ namespace {
 
 constexpr float ACCELERATION_FORCE = 100.f;
 constexpr float DECELERATION_FORCE = 10.f;
-constexpr float MAX_SPEED = 3.f;
+constexpr float MAX_SPEED = 8.f;
 
 } // namespace
 
