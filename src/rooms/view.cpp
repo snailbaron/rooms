@@ -11,9 +11,10 @@ View::View(Field& field)
         SDL_WINDOWPOS_UNDEFINED,
         config().windowWidth,
         config().windowHeight,
-        //SDL_WINDOW_FULLSCREEN_DESKTOP |
+        SDL_WINDOW_FULLSCREEN_DESKTOP |
             //SDL_WINDOW_INPUT_GRABBED |
-            SDL_WINDOW_BORDERLESS
+            //SDL_WINDOW_BORDERLESS
+            0
     ));
 
     SDL_SetRelativeMouseMode(SDL_TRUE);

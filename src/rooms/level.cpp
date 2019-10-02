@@ -5,6 +5,7 @@
 #include <limits>
 #include <istream>
 #include <sstream>
+#include <stdexcept>
 
 #include <iostream>
 
@@ -43,7 +44,7 @@ Cellar<Cell> readCellsFromStream(std::istream& input)
     return cells;
 }
 
-}
+} // namespace
 
 int sign(float value)
 {
@@ -65,7 +66,10 @@ void Level::loadFromString(const std::string& string)
 void Level::loadFromFile(const std::filesystem::path& filePath)
 {
     auto stream = std::ifstream{filePath};
-    stream.exceptions(std::ifstream::badbit);
+    if (!stream.is_open()) {
+        throw std::runtime_error{
+            "failed to open level file:" + filePath.string()};
+    }
     _cells = readCellsFromStream(stream);
 }
 
