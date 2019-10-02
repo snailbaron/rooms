@@ -51,7 +51,7 @@ void FieldView::update(float delta)
 
 void FieldView::draw(SDL_Surface* surface)
 {
-    auto direction = _field.heroBody.rotation * Vector{0, 1};
+    auto direction = _field.heroBody.rotation * Vector{0.f, 1.f};
     auto directionOrt = ort(direction);
     auto rayDirection = direction - directionOrt * _horizontalFovRatio;
     for (int i = 0; i < _resolution.x; i++) {
@@ -87,7 +87,7 @@ void FieldView::draw(SDL_Surface* surface)
 
             auto rect = SDL_Rect{topLeft.x, topLeft.y, size.x, size.y};
             auto brightness =
-                std::abs(dot(hit.normal, Vector{0, 1}));
+                std::abs(dot(hit.normal, Vector{0.f, 1.f}));
             if (hit.cell == Cell::Empty) {
                 brightness = -0.5f;
             }
@@ -97,9 +97,9 @@ void FieldView::draw(SDL_Surface* surface)
                 &rect,
                 SDL_MapRGB(
                     surface->format,
-                    90 + 50 * brightness,
-                    100 + 50 * brightness,
-                    80 + 50 * brightness));
+                    static_cast<Uint8>(90 + 50 * brightness),
+                    static_cast<Uint8>(100 + 50 * brightness),
+                    static_cast<Uint8>(80 + 50 * brightness)));
 
             if (hit.cell == Cell::HalfHeight) {
                 rect.y += rect.h;

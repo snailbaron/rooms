@@ -50,9 +50,10 @@ public:
     T& operator()(int x, int y)
     {
         auto w = std::max(x, y) + 1;
-        if (w * w >= _data.size()) {
+        auto size = 1ull * w * w;
+        if (size >= _data.size()) {
             _width = w;
-            _data.resize(w * w);
+            _data.resize(size);
         }
 
         return _data[index(x, y)];

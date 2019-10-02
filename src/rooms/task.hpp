@@ -48,7 +48,7 @@ public:
     TaskState operator()(float delta)
     {
         _point = std::fmod(_point * _period + delta, _period) / _period;
-        auto value = 0.5 + std::sin(_point * 2 * M_PI) / 2;
+        float value = 0.5f + std::sin(static_cast<float>(_point * 2 * M_PI)) / 2;
         _setter(value);
         return TaskState::Running;
     }

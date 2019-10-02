@@ -4,7 +4,11 @@
 #include "view.hpp"
 #include "geometry.hpp"
 
-#include <SDL2/SDL.h>
+#ifdef _WIN32
+    #include <SDL.h>
+#else
+    #include <SDL2/SDL.h>
+#endif
 
 #include <filesystem>
 #include <iostream>
@@ -44,4 +48,6 @@ int main(int /*argc*/, char* argv[])
     }
 
     SDL_Quit();
+
+    return 0;
 }

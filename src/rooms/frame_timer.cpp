@@ -1,7 +1,7 @@
 #include "frame_timer.hpp"
 
 FrameTimer::FrameTimer(int fps)
-    : _delta(1.0 / fps)
+    : _delta(1.f / fps)
     , _lastFrame(0)
     , _startTime(Clock::now())
     , _frameDuration(std::chrono::duration_cast<Clock::duration>(

@@ -8,7 +8,7 @@ class Game {
 public:
     void start();
 
-    void update(double delta);
+    void update(float delta);
 
 private:
     std::optional<Field> _field;

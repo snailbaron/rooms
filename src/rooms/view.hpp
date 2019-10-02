@@ -4,7 +4,11 @@
 #include "field_view.hpp"
 #include "widget.hpp"
 
-#include <SDL2/SDL.h>
+#ifdef _WIN32
+    #include <SDL.h>
+#else
+    #include <SDL2/SDL.h>
+#endif
 
 #include <memory>
 #include <type_traits>

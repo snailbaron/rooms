@@ -14,8 +14,8 @@ Cellar<Cell> readCellsFromStream(std::istream& input)
 {
     auto cells = Cellar<Cell>{};
 
-    size_t x = 0;
-    size_t y = 0;
+    int x = 0;
+    int y = 0;
     char c;
     for (input.get(c); input.good(); input.get(c)) {
         switch (c) {
@@ -124,8 +124,8 @@ std::vector<Level::Hit> Level::trace(
             hits.push_back({
                 nextCellDistance[index] * dot(lookDirection, rayDirection),
                 index == 0 ?
-                    Vector{-step[0], 0.f} :
-                    Vector{0.f, -step[1]},
+                    Vector{static_cast<float>(-step[0]), 0.f} :
+                    Vector{0.f, static_cast<float>(-step[1])},
                 Cell::Empty});
         }
 
@@ -133,8 +133,8 @@ std::vector<Level::Hit> Level::trace(
             hits.push_back({
                 nextCellDistance[index] * dot(lookDirection, rayDirection),
                 index == 0 ?
-                    Vector{-step[0], 0.f} :
-                    Vector{0.f, -step[1]},
+                    Vector{static_cast<float>(-step[0]), 0.f} :
+                    Vector{0.f, static_cast<float>(-step[1])},
                 Cell::Full});
             return hits;
         } else if (cellType == Cell::HalfHeight ||
@@ -142,8 +142,8 @@ std::vector<Level::Hit> Level::trace(
             hits.push_back({
                 nextCellDistance[index] * dot(lookDirection, rayDirection),
                 index == 0 ?
-                    Vector{-step[0], 0.f} :
-                    Vector{0.f, -step[1]},
+                    Vector{static_cast<float>(-step[0]), 0.f} :
+                    Vector{0.f, static_cast<float>(-step[1])},
                 cellType});
         } else if (cellType == Cell::SmallColumn ||
                 cellType == Cell::LargeColumn) {

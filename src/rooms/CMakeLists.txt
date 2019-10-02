@@ -10,12 +10,4 @@ add_executable(rooms
 
 target_link_libraries(rooms PRIVATE geometry)
 
-target_link_libraries(rooms PRIVATE SDL2)
-
-add_custom_command(
-    TARGET rooms
-    POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E create_symlink
-        "$<TARGET_FILE:rooms>"
-        "${PROJECT_BINARY_DIR}/$<TARGET_FILE_NAME:rooms>"
-)
+target_link_libraries(rooms PRIVATE SDL2 SDL2main)

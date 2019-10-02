@@ -22,8 +22,8 @@ void Field::update(float delta)
         heroControls.turnLeft = 0;
     }
 
-    float moveRight = heroControls.moveRight - heroControls.moveLeft;
-    float moveForward = heroControls.moveForward - heroControls.moveBackward;
+    auto moveRight = static_cast<float>(heroControls.moveRight - heroControls.moveLeft);
+    auto moveForward = static_cast<float>(heroControls.moveForward - heroControls.moveBackward);
 
     auto localForceDirection = normalize(Vector{moveRight, moveForward});
     auto forceDirection = heroBody.rotation * localForceDirection;

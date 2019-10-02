@@ -1,6 +1,6 @@
 #include "game.hpp"
 
-void Game::update(double delta)
+void Game::update(float delta)
 {
     if (_field) {
         _field->update(delta);
