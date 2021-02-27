@@ -8,8 +8,8 @@ set(CMAKE_CXX_STANDARD_REQUIRED TRUE)
 include(FetchContent)
 FetchContent_Declare(
     SDL2
-    URL "https://www.libsdl.org/release/SDL2-2.0.10.tar.gz"
-    URL_MD5 "5a2114f2a6f348bdab5bf52b994811db"
+    URL "https://www.libsdl.org/release/SDL2-2.0.12.tar.gz"
+    URL_MD5 "783b6f2df8ff02b19bb5ce492b99c8ff"
 )
 
 FetchContent_MakeAvailable(SDL2)

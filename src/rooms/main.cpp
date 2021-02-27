@@ -35,16 +35,15 @@ int main(int /*argc*/, char* argv[])
         view.processInput();
 
         auto framesPassed = frameTimer();
-        if (framesPassed == 0) {
-            continue;
-        }
+        if (framesPassed > 0) {
+            for (auto i = framesPassed; i > 0; i--) {
+                field.update(frameTimer.delta());
+            }
 
-        for (auto i = framesPassed; i > 0; i--) {
-            field.update(frameTimer.delta());
+            view.update(frameTimer.delta() * framesPassed);
+            view.draw();
         }
-
-        view.update(frameTimer.delta() * framesPassed);
-        view.draw();
+        frameTimer.relax();
     }
 
     SDL_Quit();

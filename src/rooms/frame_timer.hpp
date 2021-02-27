@@ -5,14 +5,17 @@
 class FrameTimer {
 public:
     explicit FrameTimer(int fps);
-    float delta() const;
+    double delta() const;
     int operator()();
+    void relax();
 
 private:
     using Clock = std::chrono::high_resolution_clock;
 
-    const float _delta;
-    long long _lastFrame;
-    Clock::time_point _startTime;
-    Clock::duration _frameDuration;
+    const double _delta;
+    const Clock::duration _frameDuration;
+    Clock::time_point _lastFrame;
+    Clock::time_point _currentTime;
+    Clock::time_point _nextFrame;
 };
+

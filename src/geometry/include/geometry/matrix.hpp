@@ -24,13 +24,13 @@ public:
 
     T& operator()(size_t i, size_t j)
     {
-        assert(i >= 0 && i < 2 && j >= 0 && j < 2);
+        assert(i < 2 && j < 2);
         return _values[2 * i + j];
     }
 
     const T& operator()(size_t i, size_t j) const
     {
-        assert(i >= 0 && i < 2 && j >= 0 && j < 2);
+        assert(i < 2 && j < 2);
         return _values[2 * i + j];
     }
 
